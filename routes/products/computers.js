@@ -1,9 +1,17 @@
 const express = require('express');
 const router = express.Router();
 
+//CORS
+var cors = require('cors');
+app.use(cors());
+app.listen( 8002, function () {
+    console.log('CORS-enabled web server listening on port 8003')
+});
+
+
 /* Computers */
 //get computer list
-router.get('/computers', (req, res, next) => {
+const getComputerList = (req, res, next) => {
     let sql = `SELECT * FROM computers`;
     db.query(sql, function(err, data, fields) {
         if (err) throw err;
@@ -13,10 +21,12 @@ router.get('/computers', (req, res, next) => {
           message: "Computer lists retrieved successfully"
         })
     })
-});
+}
+router.get('/computers', cors(), getComputerList);
+
 
 //get computer by ID
-router.get('/products/computers/:id', (req, res, next) => {
+const getComputer = (req, res, next) => {
     const id = req.params.id;
     console.log('Get user id = ' + id);
     let sql = 'SELECT * FROM computers WHERE id = ?'
@@ -26,10 +36,13 @@ router.get('/products/computers/:id', (req, res, next) => {
                 message: results
             })
     })
-});
+}
+router.get('/computers/:id', cors(), getComputer );
+
+
 
 //create new computer
-router.post('/computers', function(req, res) {
+const createComputer = (req, res) => {
     let sql = `INSERT INTO computers(title,image,price,type,description,spec1,spec2,spec3,spec4,spec5) VALUES (?)`;
     let values = [
       req.body.title,
@@ -50,10 +63,13 @@ router.post('/computers', function(req, res) {
         message: "New computer added successfully"
       })
     })
-  });
+  }
+router.post('/computers',  cors(), createComputer);
+
+
 
 // Update computer by ID
-router.put('/:id', (req, res) => {
+const updateComputer =  (req, res) => {
     const id = req.params.id;
     let sql = `UPDATE smartphones SET title=?, image=?, price=?, type=? ,description=?, 
     spec1=?, spec2=?, spec3=?, spec4=?, spec5=? WHERE id=${id}`;
@@ -76,10 +92,13 @@ router.put('/:id', (req, res) => {
             message: "Computer updated successfully"
         })
     });
-})
+}
+router.put('/computers/:id',  cors(), updateComputer);
 
-//delete computer by ID
-router.delete('/:id', (req, res) => {
+
+
+//Delete computer by ID
+const deleteComputer =  (req, res) => {
     const id = req.params.id;
     db.query('DELETE FROM computers WHERE id = ?', [id], (err, results, response) => {
         if (results.affectedRows == 0)
@@ -97,7 +116,8 @@ router.delete('/:id', (req, res) => {
             })
         }
     });
-})
+}
+router.delete('/computers/:id', cors(), deleteComputer);
 
 
 module.exports = router;

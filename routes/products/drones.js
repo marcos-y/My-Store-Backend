@@ -1,9 +1,16 @@
 const express = require('express');
 const router = express.Router();
 
+//CORS
+var cors = require('cors');
+app.use(cors());
+app.listen( 8003, function () {
+    console.log('CORS-enabled web server listening on port 8004')
+});
+
 /* Drones */
 //get drone list
-router.get('/drones', (req, res, next) => {
+const getDrones = (req, res, next) => {
     let sql = `SELECT * FROM drones`;
     db.query(sql, function(err, data, fields) {
         if (err) throw err;
@@ -13,10 +20,13 @@ router.get('/drones', (req, res, next) => {
           message: "Drone lists retrieved successfully"
         })
     })
-});
+}
+router.get('/drones',  cors(), getDrones);
+
+
 
 //get drone by ID
-router.get('/products/drones/:id', (req, res, next) => {
+const getDrone = (req, res, next) => {
     const id = req.params.id;
     console.log('Get user id = ' + id);
     let sql = 'SELECT * FROM drones WHERE id = ?'
@@ -26,11 +36,12 @@ router.get('/products/drones/:id', (req, res, next) => {
                 message: results
             })
     })
-});
+}
+router.get('/drones/:id',  cors(), getDrone );
 
 
 //create new drone
-router.post('/drones', function(req, res) {
+const createDrone = (req, res) => {
     let sql = `INSERT INTO drones(title,image,price,type,description,spec1,spec2,spec3,spec4,spec5) VALUES (?)`;
     let values = [
       req.body.title,
@@ -51,10 +62,13 @@ router.post('/drones', function(req, res) {
         message: "New drone added successfully"
       })
     })
-  });
+}
+router.post('/drones',  cors(), createDrone);
+
+
 
 // Update drone by ID
-router.put('/:id', (req, res) => {
+const updateDrone = (req, res) => {
     const id = req.params.id;
     let sql = `UPDATE smartphones SET title=?, image=?, price=?, type=? ,description=?, 
     spec1=?, spec2=?, spec3=?, spec4=?, spec5=? WHERE id=${id}`;
@@ -77,10 +91,13 @@ router.put('/:id', (req, res) => {
             message: "Drone updated successfully"
         })
     });
-})
+}
+router.put('/drones/:id',  cors(), updateDrone);
+
+
 
 //delete drone by ID
-router.delete('/:id', (req, res) => {
+const deleteDrone = (req, res) => {
     const id = req.params.id;
     db.query('DELETE FROM drones WHERE id = ?', [id], (err, results, response) => {
         if (results.affectedRows == 0)
@@ -98,8 +115,8 @@ router.delete('/:id', (req, res) => {
             })
         }
     });
-})
-
+}
+router.delete('/drones/:id',  cors(), deleteDrone);
 
 
 module.exports = router;

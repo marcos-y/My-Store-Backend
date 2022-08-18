@@ -1,9 +1,17 @@
 const express = require('express');
 const router = express.Router();
 
+//CORS
+var cors = require('cors');
+app.use(cors());
+app.listen( 8004, function () {
+    console.log('CORS-enabled web server listening on port 8005')
+});
+
+
 /* New Items */
-//get drone list
-router.get('/newitems', (req, res, next) => {
+//get new items list
+const getNewItems = (req, res, next) => {
     let sql = `SELECT * FROM newitems`;
     db.query(sql, function(err, data, fields) {
         if (err) throw err;
@@ -13,10 +21,13 @@ router.get('/newitems', (req, res, next) => {
           message: "New items lists retrieved successfully"
         })
     })
-});
+};
+router.get('/newitems', cors(), getNewItems);
+
+
 
 //get a new item by ID
-router.get('/products/newitems/:id', (req, res, next) => {
+const getNewItem = (req, res, next) => {
     const id = req.params.id;
     console.log('Get user id = ' + id);
     let sql = 'SELECT * FROM newitems WHERE id = ?'
@@ -26,11 +37,12 @@ router.get('/products/newitems/:id', (req, res, next) => {
                 message: results
             })
     })
-});
+}
+router.get('/newitems/:id',cors(), getNewItem );
 
 
 //create new item
-router.post('/newitems', function(req, res) {
+const createNewItem = ((req, res) => {
     let sql = `INSERT INTO newitems(title,image,price,type,description,spec1,spec2,spec3,spec4,spec5) VALUES (?)`;
     let values = [
       req.body.title,
@@ -52,9 +64,10 @@ router.post('/newitems', function(req, res) {
       })
     })
   });
+router.post('/newitems',cors(), createNewItem);
 
 //Update Newitem by ID
-router.put('/:id', (req, res) => {
+const updateNewItem = (req, res) => {
     const id = req.params.id;
     let sql = `UPDATE smartphones SET title=?, image=?, price=?, type=? ,description=?, 
     spec1=?, spec2=?, spec3=?, spec4=?, spec5=? WHERE id=${id}`;
@@ -77,10 +90,14 @@ router.put('/:id', (req, res) => {
             message: "New item updated successfully"
         })
     });
-})
+}
+router.put('/newitems/:id',cors(), updateNewItem);
+
+
+
 
 //delete new item by ID
-router.delete('/:id', (req, res) => {
+const deleteNewItem = (req, res) => {
     const id = req.params.id;
     db.query('DELETE FROM users WHERE id = ?', [id], (err, results, response) => {
         if (results.affectedRows == 0)
@@ -98,7 +115,8 @@ router.delete('/:id', (req, res) => {
             })
         }
     });
-})
+}
+router.delete('/newitems/:id',cors(), deleteNewItem);
 
 
 module.exports = router;

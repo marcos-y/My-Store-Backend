@@ -1,9 +1,17 @@
 const express = require('express');
 const router = express.Router();
 
+//CORS
+var cors = require('cors');
+app.use(cors());
+app.listen( 8005, function () {
+    console.log('CORS-enabled web server listening on port 8006')
+});
+
+
 /* Smartphones */
 //get smartphones list
-router.get('/smartphones', (req, res, next) => {
+const getSmartphones = (req, res, next) => {
     let sql = `SELECT * FROM smartphones`;
     db.query(sql, function(err, data, fields) {
         if (err) throw err;
@@ -13,10 +21,14 @@ router.get('/smartphones', (req, res, next) => {
           message: "Smartphones lists retrieved successfully"
         })
     })
-});
+}
+router.get('/smartphones', cors(),getSmartphones);
+
+
+
 
 //get an smartphone by ID
-router.get('/products/smartphones/:id', (req, res, next) => {
+const getSmartphone = (req, res, next) => {
     const id = req.params.id;
     console.log('Get user id = ' + id);
     let sql = 'SELECT * FROM smartphones WHERE id = ?'
@@ -26,10 +38,13 @@ router.get('/products/smartphones/:id', (req, res, next) => {
                 message: results
             })
     })
-});
+}
+router.get('/smartphones/:id', cors(), getSmartphone);
+
+
 
 //create new smartphone
-router.post('/smartphones', function(req, res) {
+const createSmartphone = (req, res) => {
     let sql = `INSERT INTO smartphones(title,image,price,type,description,spec1,spec2,spec3,spec4,spec5) VALUES (?)`;
     let values = [
       req.body.title,
@@ -50,11 +65,12 @@ router.post('/smartphones', function(req, res) {
         message: "New smartphone added successfully"
       })
     })
-  });
+}
+router.post('/smartphones', cors(), createSmartphone);
 
 
 // Update smartphone by ID
-router.put('/:id', (req, res) => {
+const updateSmartphone = (req, res) => {
     const id = req.params.id;
     let sql = `UPDATE smartphones SET title=?, image=?, price=?, type=? ,description=?, 
     spec1=?, spec2=?, spec3=?, spec4=?, spec5=? WHERE id=${id}`;
@@ -77,11 +93,14 @@ router.put('/:id', (req, res) => {
             message: "Smartphone updated successfully"
         })
     });
-})
+}
+router.put('/smartphones/:id', cors(), updateSmartphone);
+
+
 
 
 //delete smartphone by ID
-router.delete('/:id', (req, res) => {
+const deleteSmartphone =  (req, res) => {
     const id = req.params.id;
     db.query('DELETE FROM smartphones WHERE id = ?', [id], (err, results, response) => {
         if (results.affectedRows == 0)
@@ -99,8 +118,7 @@ router.delete('/:id', (req, res) => {
             })
         }
     });
-})
-
-
+}
+router.delete('/smartphones/:id', cors(), deleteSmartphone);
 
 module.exports = router;

@@ -1,15 +1,9 @@
 const express = require('express');
-
-app = express(),
-cors = require('cors'),
+app = express();
 bodyParser = require('body-parser');
 
 // import mysql module
 mysql = require('mysql'), 
-
-// use the modules
-app.use(cors())
-app.use(bodyParser.json());
 
 // setup database
 db = mysql.createConnection({
