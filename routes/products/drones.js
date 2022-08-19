@@ -8,6 +8,21 @@ app.listen( 8003, function () {
     console.log('CORS-enabled web server listening on port 8004')
 });
 
+//Token
+const controlarToken = async (req,res,next) =>{
+    const tokenBackend = 'holaSoyElToken';
+    const tokenCliente = req.headers.token;
+    console.log('TokenCliente',tokenCliente);
+    console.log('pasando por el middleware controlar token');
+    if (!tokenCliente || (tokenBackend != tokenCliente)){
+        //son distintos, no deberia poder ejecutar la accion pedida , por tanto lo rechazo
+        res.status(401).json({mensaje:'No autorizado a realizar la peticion'})
+    }
+    else{
+        next();
+    }
+}
+
 /* Drones */
 //get drone list
 const getDrones = (req, res, next) => {
@@ -21,7 +36,7 @@ const getDrones = (req, res, next) => {
         })
     })
 }
-router.get('/drones',  cors(), getDrones);
+router.get('/drones',  cors(),  controlarToken, getDrones);
 
 
 
@@ -37,7 +52,7 @@ const getDrone = (req, res, next) => {
             })
     })
 }
-router.get('/drones/:id',  cors(), getDrone );
+router.get('/drones/:id',  cors(), controlarToken, getDrone );
 
 
 //create new drone
@@ -63,7 +78,7 @@ const createDrone = (req, res) => {
       })
     })
 }
-router.post('/drones',  cors(), createDrone);
+router.post('/drones',  cors(),  controlarToken, createDrone);
 
 
 
@@ -92,7 +107,7 @@ const updateDrone = (req, res) => {
         })
     });
 }
-router.put('/drones/:id',  cors(), updateDrone);
+router.put('/drones/:id',  cors(), controlarToken, updateDrone);
 
 
 
@@ -116,7 +131,7 @@ const deleteDrone = (req, res) => {
         }
     });
 }
-router.delete('/drones/:id',  cors(), deleteDrone);
+router.delete('/drones/:id',  cors(), controlarToken, deleteDrone);
 
 
 module.exports = router;

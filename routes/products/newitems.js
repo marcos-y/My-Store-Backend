@@ -8,6 +8,21 @@ app.listen( 8004, function () {
     console.log('CORS-enabled web server listening on port 8005')
 });
 
+//Token
+const controlarToken = async (req,res,next) =>{
+    const tokenBackend = 'holaSoyElToken';
+    const tokenCliente = req.headers.token;
+    console.log('TokenCliente',tokenCliente);
+    console.log('pasando por el middleware controlar token');
+    if (!tokenCliente || (tokenBackend != tokenCliente)){
+        //son distintos, no deberia poder ejecutar la accion pedida , por tanto lo rechazo
+        res.status(401).json({mensaje:'No autorizado a realizar la peticion'})
+    }
+    else{
+        next();
+    }
+}
+
 
 /* New Items */
 //get new items list
@@ -22,7 +37,7 @@ const getNewItems = (req, res, next) => {
         })
     })
 };
-router.get('/newitems', cors(), getNewItems);
+router.get('/newitems', cors(), controlarToken, getNewItems);
 
 
 
@@ -38,7 +53,7 @@ const getNewItem = (req, res, next) => {
             })
     })
 }
-router.get('/newitems/:id',cors(), getNewItem );
+router.get('/newitems/:id',cors(),controlarToken, getNewItem );
 
 
 //create new item
@@ -64,9 +79,9 @@ const createNewItem = ((req, res) => {
       })
     })
   });
-router.post('/newitems',cors(), createNewItem);
+router.post('/newitems',cors(), controlarToken, createNewItem);
 
-//Update Newitem by ID
+//Update new item by ID
 const updateNewItem = (req, res) => {
     const id = req.params.id;
     let sql = `UPDATE smartphones SET title=?, image=?, price=?, type=? ,description=?, 
@@ -91,7 +106,7 @@ const updateNewItem = (req, res) => {
         })
     });
 }
-router.put('/newitems/:id',cors(), updateNewItem);
+router.put('/newitems/:id',cors(), controlarToken, updateNewItem);
 
 
 
@@ -116,7 +131,7 @@ const deleteNewItem = (req, res) => {
         }
     });
 }
-router.delete('/newitems/:id',cors(), deleteNewItem);
+router.delete('/newitems/:id',cors(), controlarToken, deleteNewItem);
 
 
 module.exports = router;

@@ -8,6 +8,20 @@ app.listen( 8002, function () {
     console.log('CORS-enabled web server listening on port 8003')
 });
 
+//Token
+const controlarToken = async (req,res,next) =>{
+    const tokenBackend = 'holaSoyElToken';
+    const tokenCliente = req.headers.token;
+    console.log('TokenCliente',tokenCliente);
+    console.log('pasando por el middleware controlar token');
+    if (!tokenCliente || (tokenBackend != tokenCliente)){
+        //son distintos, no deberia poder ejecutar la accion pedida , por tanto lo rechazo
+        res.status(401).json({mensaje:'No autorizado a realizar la peticion'})
+    }
+    else{
+        next();
+    }
+}
 
 /* Computers */
 //get computer list
@@ -22,7 +36,7 @@ const getComputerList = (req, res, next) => {
         })
     })
 }
-router.get('/computers', cors(), getComputerList);
+router.get('/computers', cors(), controlarToken, getComputerList);
 
 
 //get computer by ID
@@ -37,7 +51,7 @@ const getComputer = (req, res, next) => {
             })
     })
 }
-router.get('/computers/:id', cors(), getComputer );
+router.get('/computers/:id', cors(),  controlarToken, getComputer );
 
 
 
@@ -64,7 +78,7 @@ const createComputer = (req, res) => {
       })
     })
   }
-router.post('/computers',  cors(), createComputer);
+router.post('/computers',  cors(),  controlarToken, createComputer);
 
 
 
@@ -93,7 +107,7 @@ const updateComputer =  (req, res) => {
         })
     });
 }
-router.put('/computers/:id',  cors(), updateComputer);
+router.put('/computers/:id',  cors(),  controlarToken, updateComputer);
 
 
 
@@ -117,7 +131,7 @@ const deleteComputer =  (req, res) => {
         }
     });
 }
-router.delete('/computers/:id', cors(), deleteComputer);
+router.delete('/computers/:id', cors(),  controlarToken, deleteComputer);
 
 
 module.exports = router;

@@ -8,6 +8,21 @@ app.listen( 8001, function () {
     console.log('CORS-enabled web server listening on port 8002')
 });
 
+//Token
+const controlarToken = async (req,res,next) =>{
+    const tokenBackend = 'holaSoyElToken';
+    const tokenCliente = req.headers.token;
+    console.log('TokenCliente',tokenCliente);
+    console.log('pasando por el middleware controlar token');
+    if (!tokenCliente || (tokenBackend != tokenCliente)){
+        //son distintos, no deberia poder ejecutar la accion pedida , por tanto lo rechazo
+        res.status(401).json({mensaje:'No autorizado a realizar la peticion'})
+    }
+    else{
+        next();
+    }
+}
+
 /* Users */
 //get users list
 const getUsers = (req, res, next) => {
@@ -21,7 +36,7 @@ const getUsers = (req, res, next) => {
         })
     })
 }
-router.get('/',  cors(), getUsers);
+router.get('/', cors() , controlarToken , getUsers);
 
 
 
@@ -39,7 +54,7 @@ const getUser = (req, res, next) => {
         })
     })
 }
-router.get('/:id', cors(), getUser );
+router.get('/:id', cors(), controlarToken, getUser );
 
 
 
@@ -65,7 +80,7 @@ const createUser = (req, res) => {
         })
     })
 }
-router.post('/', cors(), createUser);
+router.post('/', cors(), controlarToken, createUser);
 
 
 
@@ -92,7 +107,7 @@ const updateUser = (req, res) => {
         })
     });
 }
-router.put('/:id', cors(), updateUser );
+router.put('/:id', cors(), controlarToken, updateUser );
 
 
 
@@ -115,6 +130,6 @@ const deleteUser = (req, res) => {
         }
     });
 }
-router.delete('/:id', cors(), deleteUser);
+router.delete('/:id', cors(), controlarToken, deleteUser);
 
 module.exports = router;

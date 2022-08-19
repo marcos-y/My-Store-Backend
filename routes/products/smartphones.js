@@ -8,6 +8,21 @@ app.listen( 8005, function () {
     console.log('CORS-enabled web server listening on port 8006')
 });
 
+//Token
+const controlarToken = async (req,res,next) =>{
+    const tokenBackend = 'holaSoyElToken';
+    const tokenCliente = req.headers.token;
+    console.log('TokenCliente',tokenCliente);
+    console.log('pasando por el middleware controlar token');
+    if (!tokenCliente || (tokenBackend != tokenCliente)){
+        //son distintos, no deberia poder ejecutar la accion pedida , por tanto lo rechazo
+        res.status(401).json({mensaje:'No autorizado a realizar la peticion'})
+    }
+    else{
+        next();
+    }
+}
+
 
 /* Smartphones */
 //get smartphones list
@@ -22,7 +37,7 @@ const getSmartphones = (req, res, next) => {
         })
     })
 }
-router.get('/smartphones', cors(),getSmartphones);
+router.get('/smartphones', cors(), controlarToken, getSmartphones);
 
 
 
@@ -39,7 +54,7 @@ const getSmartphone = (req, res, next) => {
             })
     })
 }
-router.get('/smartphones/:id', cors(), getSmartphone);
+router.get('/smartphones/:id', cors(), controlarToken, getSmartphone);
 
 
 
@@ -66,7 +81,7 @@ const createSmartphone = (req, res) => {
       })
     })
 }
-router.post('/smartphones', cors(), createSmartphone);
+router.post('/smartphones', cors(), controlarToken, createSmartphone);
 
 
 // Update smartphone by ID
@@ -94,7 +109,7 @@ const updateSmartphone = (req, res) => {
         })
     });
 }
-router.put('/smartphones/:id', cors(), updateSmartphone);
+router.put('/smartphones/:id', cors(), controlarToken, updateSmartphone);
 
 
 
@@ -119,6 +134,6 @@ const deleteSmartphone =  (req, res) => {
         }
     });
 }
-router.delete('/smartphones/:id', cors(), deleteSmartphone);
+router.delete('/smartphones/:id', cors(), controlarToken, deleteSmartphone);
 
 module.exports = router;
