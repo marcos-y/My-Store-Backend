@@ -1,5 +1,23 @@
 const express = require('express');
 const router = express.Router();
+const multer = require('multer');
+
+//Multer for Images
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+      cb(null, './images/computers')
+      console.log(req)
+      console.log(file)
+    },
+    filename: function (req, file, cb) {
+        console.log(req)
+        console.log(file)
+      const name = ( Date.now() + '-' + file.originalname )
+      cb(null, file.fieldname + '-' + name)
+    }
+})
+  
+const upload = multer({ storage: storage })
 
 //CORS
 var cors = require('cors');
@@ -36,7 +54,7 @@ const getComputerList = (req, res, next) => {
         })
     })
 }
-router.get('/computers', cors(), controlarToken, getComputerList);
+router.get('/computers', cors(), getComputerList);
 
 
 //get computer by ID
@@ -51,16 +69,18 @@ const getComputer = (req, res, next) => {
             })
     })
 }
-router.get('/computers/:id', cors(),  controlarToken, getComputer );
+router.get('/computers/:id', cors(), getComputer );
 
 
 
 //create new computer
 const createComputer = (req, res) => {
+    const urlImage = 'http://localhost:8080/images/computers/' + req.file.filename;
+    console.log(urlImage);
     let sql = `INSERT INTO computers(title,image,price,type,description,spec1,spec2,spec3,spec4,spec5) VALUES (?)`;
     let values = [
       req.body.title,
-      req.body.image,
+      urlImage,
       req.body.price,
       req.body.type,
       req.body.description,
@@ -78,7 +98,7 @@ const createComputer = (req, res) => {
       })
     })
   }
-router.post('/computers',  cors(),  controlarToken, createComputer);
+router.post('/computers', cors(), upload.single("image"), createComputer);
 
 
 
@@ -107,7 +127,7 @@ const updateComputer =  (req, res) => {
         })
     });
 }
-router.put('/computers/:id',  cors(),  controlarToken, updateComputer);
+router.put('/computers/:id',  cors(),updateComputer);
 
 
 
@@ -131,7 +151,7 @@ const deleteComputer =  (req, res) => {
         }
     });
 }
-router.delete('/computers/:id', cors(),  controlarToken, deleteComputer);
+router.delete('/computers/:id', cors(), deleteComputer);
 
 
 module.exports = router;

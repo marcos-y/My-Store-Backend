@@ -1,5 +1,22 @@
 const express = require('express');
 const router = express.Router();
+const multer = require('multer');
+
+//Multer for Images
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+      cb(null, './images/newitems')
+      console.log(req)
+      console.log(file)
+    },
+    filename: function (req, file, cb) {
+        console.log(req)
+        console.log(file)
+      const name = ( Date.now() + '-' + file.originalname )
+      cb(null, file.fieldname + '-' + name)
+    }
+})
+const upload = multer({ storage: storage })
 
 //CORS
 var cors = require('cors');
@@ -37,7 +54,7 @@ const getNewItems = (req, res, next) => {
         })
     })
 };
-router.get('/newitems', cors(), controlarToken, getNewItems);
+router.get('/newitems', cors(), getNewItems);
 
 
 
@@ -53,15 +70,16 @@ const getNewItem = (req, res, next) => {
             })
     })
 }
-router.get('/newitems/:id',cors(),controlarToken, getNewItem );
+router.get('/newitems/:id',cors(), getNewItem );
 
 
 //create new item
 const createNewItem = ((req, res) => {
+    const urlImage = 'http://localhost:8080/images/newitems/' + req.file.filename;
     let sql = `INSERT INTO newitems(title,image,price,type,description,spec1,spec2,spec3,spec4,spec5) VALUES (?)`;
     let values = [
       req.body.title,
-      req.body.image,
+      urlImage,
       req.body.price,
       req.body.type,
       req.body.description,
@@ -79,7 +97,7 @@ const createNewItem = ((req, res) => {
       })
     })
   });
-router.post('/newitems',cors(), controlarToken, createNewItem);
+router.post('/newitems',cors(),  upload.single("image"), createNewItem);
 
 //Update new item by ID
 const updateNewItem = (req, res) => {
@@ -106,7 +124,7 @@ const updateNewItem = (req, res) => {
         })
     });
 }
-router.put('/newitems/:id',cors(), controlarToken, updateNewItem);
+router.put('/newitems/:id',cors(), updateNewItem);
 
 
 
@@ -131,7 +149,7 @@ const deleteNewItem = (req, res) => {
         }
     });
 }
-router.delete('/newitems/:id',cors(), controlarToken, deleteNewItem);
+router.delete('/newitems/:id',cors(), deleteNewItem);
 
 
 module.exports = router;

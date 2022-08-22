@@ -36,7 +36,7 @@ const getUsers = (req, res, next) => {
         })
     })
 }
-router.get('/', cors() , controlarToken , getUsers);
+router.get('/', cors()  , getUsers);
 
 
 
@@ -54,7 +54,7 @@ const getUser = (req, res, next) => {
         })
     })
 }
-router.get('/:id', cors(), controlarToken, getUser );
+router.get('/:id', cors(), getUser );
 
 
 
@@ -80,7 +80,7 @@ const createUser = (req, res) => {
         })
     })
 }
-router.post('/', cors(), controlarToken, createUser);
+router.post('/', cors(), createUser);
 
 
 
@@ -107,7 +107,7 @@ const updateUser = (req, res) => {
         })
     });
 }
-router.put('/:id', cors(), controlarToken, updateUser );
+router.put('/:id', cors(),updateUser );
 
 
 
@@ -130,6 +130,6 @@ const deleteUser = (req, res) => {
         }
     });
 }
-router.delete('/:id', cors(), controlarToken, deleteUser);
+router.delete('/:id', cors(), deleteUser);
 
 module.exports = router;

@@ -1,5 +1,22 @@
 const express = require('express');
 const router = express.Router();
+const multer = require('multer');
+
+//Multer for Images
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+      cb(null, './images/drones')
+      console.log(req)
+      console.log(file)
+    },
+    filename: function (req, file, cb) {
+        console.log(req)
+        console.log(file)
+      const name = ( Date.now() + '-' + file.originalname )
+      cb(null, file.fieldname + '-' + name)
+    }
+})
+const upload = multer({ storage: storage })
 
 //CORS
 var cors = require('cors');
@@ -36,7 +53,7 @@ const getDrones = (req, res, next) => {
         })
     })
 }
-router.get('/drones',  cors(),  controlarToken, getDrones);
+router.get('/drones',  cors(), getDrones);
 
 
 
@@ -52,15 +69,16 @@ const getDrone = (req, res, next) => {
             })
     })
 }
-router.get('/drones/:id',  cors(), controlarToken, getDrone );
+router.get('/drones/:id',  cors(), getDrone );
 
 
 //create new drone
 const createDrone = (req, res) => {
+    const urlImage = 'http://localhost:8080/images/drones/' + req.file.filename;
     let sql = `INSERT INTO drones(title,image,price,type,description,spec1,spec2,spec3,spec4,spec5) VALUES (?)`;
     let values = [
       req.body.title,
-      req.body.image,
+      urlImage,
       req.body.price,
       req.body.type,
       req.body.description,
@@ -78,7 +96,7 @@ const createDrone = (req, res) => {
       })
     })
 }
-router.post('/drones',  cors(),  controlarToken, createDrone);
+router.post('/drones',  cors(), upload.single("image"), createDrone);
 
 
 
@@ -107,7 +125,7 @@ const updateDrone = (req, res) => {
         })
     });
 }
-router.put('/drones/:id',  cors(), controlarToken, updateDrone);
+router.put('/drones/:id',  cors(), updateDrone);
 
 
 
@@ -131,7 +149,7 @@ const deleteDrone = (req, res) => {
         }
     });
 }
-router.delete('/drones/:id',  cors(), controlarToken, deleteDrone);
+router.delete('/drones/:id',  cors(), deleteDrone);
 
 
 module.exports = router;

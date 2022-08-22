@@ -1,5 +1,22 @@
 const express = require('express');
 const router = express.Router();
+const multer = require('multer');
+
+//Multer for Images
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+      cb(null, './images/smartphones')
+      console.log(req)
+      console.log(file)
+    },
+    filename: function (req, file, cb) {
+        console.log(req)
+        console.log(file)
+      const name = ( Date.now() + '-' + file.originalname )
+      cb(null, file.fieldname + '-' + name)
+    }
+})
+const upload = multer({ storage: storage })
 
 //CORS
 var cors = require('cors');
@@ -37,7 +54,7 @@ const getSmartphones = (req, res, next) => {
         })
     })
 }
-router.get('/smartphones', cors(), controlarToken, getSmartphones);
+router.get('/smartphones', cors(), getSmartphones);
 
 
 
@@ -54,16 +71,17 @@ const getSmartphone = (req, res, next) => {
             })
     })
 }
-router.get('/smartphones/:id', cors(), controlarToken, getSmartphone);
+router.get('/smartphones/:id', cors(), getSmartphone);
 
 
 
 //create new smartphone
 const createSmartphone = (req, res) => {
+    const urlImage = 'http://localhost:8080/images/smartphones/' + req.file.filename;
     let sql = `INSERT INTO smartphones(title,image,price,type,description,spec1,spec2,spec3,spec4,spec5) VALUES (?)`;
     let values = [
       req.body.title,
-      req.body.image,
+      urlImage,
       req.body.price,
       req.body.type,
       req.body.description,
@@ -81,7 +99,7 @@ const createSmartphone = (req, res) => {
       })
     })
 }
-router.post('/smartphones', cors(), controlarToken, createSmartphone);
+router.post('/smartphones', cors(), upload.single("image"), createSmartphone);
 
 
 // Update smartphone by ID
@@ -109,7 +127,7 @@ const updateSmartphone = (req, res) => {
         })
     });
 }
-router.put('/smartphones/:id', cors(), controlarToken, updateSmartphone);
+router.put('/smartphones/:id', cors(), updateSmartphone);
 
 
 
@@ -134,6 +152,6 @@ const deleteSmartphone =  (req, res) => {
         }
     });
 }
-router.delete('/smartphones/:id', cors(), controlarToken, deleteSmartphone);
+router.delete('/smartphones/:id', cors(), deleteSmartphone);
 
 module.exports = router;

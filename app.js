@@ -29,6 +29,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 
+//GET for images
+app.use('/images',express.static("images"));
+
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));
