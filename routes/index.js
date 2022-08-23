@@ -5,12 +5,26 @@ bodyParser = require('body-parser');
 // import mysql module
 mysql = require('mysql'), 
 
-// setup database
-db = mysql.createConnection({
+// setup local database
+{
+  /*
+  db = mysql.createConnection({
   host: 'localhost',
   user: 'root',
   password: '',
   database: 'mystore'
+})
+  */
+}
+
+//setup remote hostinger database
+// setup local database
+db = mysql.createConnection({
+  host: '185.213.81.1',
+  user: 'u475078680_mystore',
+  password: 'MyStore12345',
+  database: 'u475078680_mystore',
+  debug: false
 })
 
 const router = express.Router();
